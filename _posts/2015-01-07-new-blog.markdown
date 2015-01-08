@@ -1,0 +1,5 @@
+---
+layout: post
+title:  "New blog"
+---
+People say that there's always someone out there who knows less than you do, so in that spirit, here are some ramblings that hopefully may prove useful to someone.
