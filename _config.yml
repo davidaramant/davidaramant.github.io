@@ -1,8 +1,7 @@
 # Site settings
 title: David Aramant's Blog
 email: davidaramant@gmail.com
-description: >
-  yet another blog
+description: ""
 baseurl: "" # the subpath of your site, e.g. /blog/
 url: "" # the base hostname & protocol for your site
 twitter_username: davidaramant
