@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on David Aramant</title>
+    <link>https://davidaramant.github.io/post/index.xml</link>
+    <description>Recent content in Posts on David Aramant</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 06 Apr 2017 13:05:10 -0400</lastBuildDate>
+    <atom:link href="https://davidaramant.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>First Post</title>
+      <link>https://davidaramant.github.io/post/2017-04-06-first-post/</link>
+      <pubDate>Thu, 06 Apr 2017 13:05:10 -0400</pubDate>
+      
+      <guid>https://davidaramant.github.io/post/2017-04-06-first-post/</guid>
+      <description>&lt;p&gt;This is a very, very exciting first post that&amp;rsquo;s just to make sure everything works.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
