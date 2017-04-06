@@ -3,7 +3,6 @@ languageCode = "en-us"
 title = "David Aramant's Blog"
 theme = "hugo-steam-theme"
 paginate = 10
-publishDir = "docs"
 
 [params]
 
