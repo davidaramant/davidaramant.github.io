@@ -2,21 +2,73 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>David Aramant</title>
-    <link>https://davidaramant.github.io/index.xml</link>
+    <link>https://davidaramant.github.io/</link>
     <description>Recent content on David Aramant</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 06 Apr 2017 13:05:10 -0400</lastBuildDate>
-    <atom:link href="https://davidaramant.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 12 Apr 2017 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://davidaramant.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
-      <title>First Post</title>
-      <link>https://davidaramant.github.io/post/2017-04-06-first-post/</link>
-      <pubDate>Thu, 06 Apr 2017 13:05:10 -0400</pubDate>
+      <title>The Buddhabrot Part 5: The Big Reveal</title>
+      <link>https://davidaramant.github.io/post/the-buddhabrot-part-5/</link>
+      <pubDate>Wed, 12 Apr 2017 00:00:00 +0000</pubDate>
       
-      <guid>https://davidaramant.github.io/post/2017-04-06-first-post/</guid>
-      <description>&lt;p&gt;This is a very, very exciting first post that&amp;rsquo;s just to make sure everything works.&lt;/p&gt;
-</description>
+      <guid>https://davidaramant.github.io/post/the-buddhabrot-part-5/</guid>
+      <description>I think it&amp;rsquo;s high time the big version is shown off&amp;hellip;
+The 68.7 Gigapixel Buddhabrot Tada! You can pan around and use the mouse wheel to zoom in/out. It should work fine on mobile too.
+Thanks to SEP for being willing to host it.
+Guided Tour Lets examine some features to back up some of the claims I&amp;rsquo;ve made throughout the series.
+The effects of high iteration limits I stated that using higher minimum/maximum iteration limits made the Buddhabrot &amp;ldquo;cooler.</description>
+    </item>
+    
+    <item>
+      <title>The Buddhabrot Part 4: Code Optimizations</title>
+      <link>https://davidaramant.github.io/post/the-buddhabrot-part-4/</link>
+      <pubDate>Tue, 11 Apr 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://davidaramant.github.io/post/the-buddhabrot-part-4/</guid>
+      <description>OK - we&amp;rsquo;ve drastically reduced the amount of work we have to do, so now lets try to optimize what&amp;rsquo;s left as much as possible.
+A note on benchmarks&amp;hellip; Benchmarks are hard.
+ There are three kinds of lies: lies, damned lies, and statistics benchmarks.
+Jon Skeet, probably
+ Benchmarks in .NET are even harder - you&amp;rsquo;ve got the just-in-time compiler, the garbage collector, etc. Now, Jon Skeet might not have said the above, but he did work on the excellent BenchmarkDotNet project that makes some of the mechanics easier.</description>
+    </item>
+    
+    <item>
+      <title>The Buddhabrot Part 3: Algorithmic Optimizations</title>
+      <link>https://davidaramant.github.io/post/the-buddhabrot-part-3/</link>
+      <pubDate>Mon, 10 Apr 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://davidaramant.github.io/post/the-buddhabrot-part-3/</guid>
+      <description>In the last part we learned what the Buddhabrot is and why it&amp;rsquo;s pretty slow to generate. As a recap, my version of it uses the following values:
+ Minimum iteration limit: 1,000,000 Maximum iteration limit: 5,000,000 Size: 68,719,476,736 pixels (262,144 x 262,144)  Algorithmic Optimizations  The real problem is that programmers have spent far too much time worrying about efficiency in the wrong places and at the wrong times; premature optimization is the root of all evil (or at least most of it) in programming.</description>
+    </item>
+    
+    <item>
+      <title>The Buddhabrot Part 2: What is the Buddhabrot?</title>
+      <link>https://davidaramant.github.io/post/the-buddhabrot-part-2/</link>
+      <pubDate>Fri, 07 Apr 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://davidaramant.github.io/post/the-buddhabrot-part-2/</guid>
+      <description>In the last part we learned what the Mandelbrot set is.
+Visualizing the Mandelbrot Set With what we&amp;rsquo;ve talked about so far, we can make a very crisp, black-and-white version:
+That&amp;rsquo;s cool and all, but normally when you see the Mandelbrot set there&amp;rsquo;s more going on than this. What info do we have to visualize?
+Escape Time One thing we can visualize is the escape time - how many iterations it took for the point to escape the circle and bail out of the loop:</description>
+    </item>
+    
+    <item>
+      <title>The Buddhabrot Part 1: What is the Mandelbrot set?</title>
+      <link>https://davidaramant.github.io/post/the-buddhabrot-part-1/</link>
+      <pubDate>Thu, 06 Apr 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://davidaramant.github.io/post/the-buddhabrot-part-1/</guid>
+      <description>At the inaugural Indy.Code() conference I presented on how I generated a 68.7 gigapixel rendering of the Buddhabrot fractal. For now, all you need to know that it&amp;rsquo;s this thing&amp;hellip;
+&amp;hellip;but really, really gigantic.
+In this series I&amp;rsquo;ll explain what the Buddhabrot is and how I made my version.
+Introduction I was introduced to the Buddhabrot in a college class I took about fractals (technically, it was about Chaotic Dynamical Systems but I don&amp;rsquo;t remember too much about that.</description>
     </item>
     
   </channel>

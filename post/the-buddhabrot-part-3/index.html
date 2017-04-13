@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>The Buddhabrot Part 3: Algorithmic Optimizations &middot; David Aramant</title>
+    <meta name="author" content="David Aramant">
+    
+    <meta name="generator" content="Hugo 0.20" />
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <!-- RSS autodiscovery -->
+    
+
+    <link rel="shortcut icon" href="https://davidaramant.github.io/img/favicon.ico">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://davidaramant.github.io/css/screen.css">
+    <link rel="stylesheet" href="https://davidaramant.github.io/css/github.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/styles/default.min.css">
+    
+
+    
+
+    <!-- Stylesheet for theme color -->
+    <style type="text/css">
+    a, a:visited {color: #f05948;}
+    .pagination a {color: #f05948;}
+    .gist .gist-file .gist-meta a:visited {color: #f05948 !important;}
+    a:focus, a:hover {color: #c62310;}
+    h1.post-title a:focus, h1.post-title a:hover, h1.blog-title a:focus, h1.blog-title a:hover {color: #c62310;}
+    .older-posts:hover, .newer-posts:hover {color: #c62310;}
+</style>
+</head>
+
+<body class="home-template">
+    <header id="site-head">
+	
+	<h1 class="blog-title"><a href="https://davidaramant.github.io/">David Aramant</a></h1>
+	
+	
+	<h1 class="blog-subtitle">Hi! You&rsquo;ve somehow found my blog!</h1>
+	
+</header>
+    
+    
+    <main class="content" role="main">
+    
+<article class="post">
+    <header>
+        <h1 class="post-title">The Buddhabrot Part 3: Algorithmic Optimizations</h1>
+        <div class="post-meta">
+            <time datetime="10 April 2017">
+                10 April 2017
+            </time>
+        </div>
+    </header>
+
+    <section class="post-content">
+        
+
+<p>In the <a href="/post/the-buddhabrot-part-2">last part</a> we learned what the Buddhabrot is and why it&rsquo;s pretty slow to generate.  As a recap, my version of it uses the following values:</p>
+
+<ul>
+<li>Minimum iteration limit: 1,000,000</li>
+<li>Maximum iteration limit: 5,000,000</li>
+<li>Size: 68,719,476,736 pixels (262,144 x 262,144)</li>
+</ul>
+
+<h2 id="algorithmic-optimizations">Algorithmic Optimizations</h2>
+
+<blockquote>
+<p>The real problem is that programmers have spent far too much time worrying about efficiency in the wrong places and at the wrong times; <strong>premature optimization is the root of all evil</strong> (or at least most of it) in programming.</p>
+
+<p>Donald Knuth</p>
+</blockquote>
+
+<p>Before we start throwing code at the problem we&rsquo;re going to have to put on our thinking caps and try to figure out some ways to reduce the amount of work we&rsquo;re doing.</p>
+
+<p>Let&rsquo;s take a look at the Mandelbrot set again:</p>
+
+<p><img src="/buddhabrot/complex_plane_mandelbrot.png" alt="Mandelbrot Set" /></p>
+
+<p>Since we only care about points that <em>aren&rsquo;t</em> in the set and our maximum iteration count is pretty high (5 million), picking a point that&rsquo;s inside the set is obviously very expensive.  Remember, those points will never leave the circle even under infinite iteration, so we will always loop for our maximum number before we have to throw away all that work.</p>
+
+<p>Is there some faster way to tell whether a point is in the set?</p>
+
+<h3 id="main-bulb-check">Main Bulb Check</h3>
+
+<p>As it turns out, kind of.  The main bulb of the set can be perfectly described by a <a href="https://en.wikipedia.org/wiki/Cardioid">cardioid</a>, and it&rsquo;s possible to fit circles inside of all of the smaller bulbs:</p>
+
+<p><img src="/buddhabrot/mandelbrot_bulbs_excluded.png" alt="Mandelbrot Set with the bulbs excluded" /></p>
+
+<p>With this optimization, we can easily discard any starting point from those areas with a quick geometric check.</p>
+
+<p>How do you find the equations for those areas?  Well, uh, you search the internet.  There&rsquo;s an equation that you can solve to get the position/size for all those circles, but I&rsquo;m not sure I even know the name of the math class that I <em>didn&rsquo;t</em> take in college that would have let me solve for those.</p>
+
+<h3 id="where-are-the-interesting-points">Where are the interesting points?</h3>
+
+<p>OK, so far, so good - that eliminates a bunch of points we <em>don&rsquo;t</em> want.  Where are the points we <em>do</em> want?</p>
+
+<p>Lets take another look at the visualization of the escape times:</p>
+
+<p><img src="/buddhabrot/escape_time_bw.png" alt="Escape Time visualized in Black and White" /></p>
+
+<p>From this, we can see that the escape time increases as you move closer and closer to the border of the Mandelbrot set.  In other words, since we are looking for points that escape between 1 - 5 million iterations, we only need to search in areas that are really close to the edge.</p>
+
+<h3 id="border-regions">Border Regions</h3>
+
+<p><img src="/buddhabrot/mandelbrot_edge_areas.png" alt="Mandelbrot Set with border regions highlighted" /></p>
+
+<p>By find the border areas we can <em>dramatically</em> increase the chances that we pick a point that will match our criteria.  Instead of picking a random starting point from the comparatively giant gray circle, we can now limit ourselves to only those areas highlighted in red above.  This is <em>by far</em> the most important optimization we can do.</p>
+
+<p>There&rsquo;s multiple ways of find the border regions, but the algorithm I used isn&rsquo;t particularly complex:</p>
+
+<ul>
+<li>Divide up the area into a grid of points.</li>
+<li>Iterate each point to see whether it is inside or outside the set.</li>
+<li>The border regions are going to be the squares where some of the points are in the set and some aren&rsquo;t:
+
+<ul>
+<li>If all four corners are <em>not</em> in the set, we assume it&rsquo;s outside</li>
+<li>If all four corners are in the set, we assume it&rsquo;s inside</li>
+<li>If the corners are a mix, the region must include part of the border</li>
+</ul></li>
+</ul>
+
+<p>Yes, there will be regions that the set dips into without covering one of the corners.  That will be true no matter what resolution of the grid you choose, however, since the Mandelbrot set has infinite detail.</p>
+
+<h3 id="any-other-optimizations">Any other optimizations?</h3>
+
+<p>In our first optimization, we were able to filter out <em>some</em> of the points inside the Mandelbrot set.  However, it&rsquo;s still very possible we&rsquo;ll run into some of them.  What actually happens to the points that are inside the set when you iterate them?</p>
+
+<p>Perhaps unsurprisingly, they will eventually get caught in an infinite loop, generating the same points over and over again.</p>
+
+<h4 id="cycle-detection">Cycle Detection</h4>
+
+<p>To catch points like that we can use a cycle detection algorithm like <a href="https://en.wikipedia.org/wiki/Cycle_detection#Brent.27s_algorithm">Brent&rsquo;s algorithm</a>.  Essentially, it periodically checks the current <em>z</em> value against an older version to see if we&rsquo;re revisiting older points.</p>
+
+<p>This algorithm felt a bit weird to me when I first saw it because it&rsquo;s directly comparing floating-point numbers, which is probably the biggest thing you&rsquo;re never supposed to do with floating-point numbers.  Well, this is one of the rare exceptions to the rule.  If the <em>z</em> value is ever the exact same binary value as a previous <em>z</em> it will naturally become an infinite loop since the algorithm is deterministic - the same input will always generate the same output.</p>
+
+<p>When I implemented this I had no concept of how much or little it improved the speed.  Lets come back to it later to see if we can answer that&hellip;</p>
+
+<h3 id="what-optimization-aren-t-we-doing">What optimization <em>aren&rsquo;t</em> we doing?</h3>
+
+<p>Lets take a look at a plain rendering of the set again:</p>
+
+<p><img src="/buddhabrot/crisp_mandelbrot.png" alt="Crisp B/W Mandelbrot" /></p>
+
+<p>Can you think of an optimization we haven&rsquo;t talked about?  Hint: it would make things twice as fast&hellip;</p>
+
+<p>If you guessed something involving <em>symmetry</em> you are correct.  The Mandelbrot set is perfectly symmetrical across the real axis.  For the purpose of the Buddhabrot, we <em>could</em> mirror everything we did and thereby find points twice as fast, at the cost of making it mirrored.  We&rsquo;ll revisit this when I talk about the final rendering, but this is one optimization I intentionally skipped.</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>We&rsquo;ve covered some algorithmic means of reducing the amount of work we have to do.  In the <a href="/post/the-buddhabrot-part-4">next installment</a>, we can move on to code optimizations.</p>
+
+    </section>
+
+    
+    <section class="post-tags" style="padding-bottom:60px;">
+        <div class="post-meta tags">
+            <i class="fa fa-fw fa-tag"></i>
+            
+                
+                <a href="https://davidaramant.github.io/tags/work-related">Work related </a>
+            
+                
+                <a href="https://davidaramant.github.io/tags/buddhabrot">Buddhabrot </a>
+            
+        </div>
+    </section>
+    
+    
+    <section class="share">
+    <p class="backtotop"><a data-scroll href="#site-head"><i class="fa fa-lg fa-fw fa-angle-double-up"></i></a><a data-scroll class="backtotoptext" href="#site-head"> Back to top</a></p>
+    <p class="info prompt">Share</p>
+    <a href="http://twitter.com/share?text=The%20Buddhabrot%20Part%203%3a%20Algorithmic%20Optimizations&url=https%3a%2f%2fdavidaramant.github.io%2fpost%2fthe-buddhabrot-part-3%2f" title="Share on Twitter"
+        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <i class="fa fa-2x fa-fw fa-twitter-square"></i> <span class="hidden">Twitter</span>
+    </a>
+    <a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fdavidaramant.github.io%2fpost%2fthe-buddhabrot-part-3%2f" title="Share on Facebook"
+        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <i class="fa fa-2x fa-fw fa-facebook-square" style="margin-left: -8px"></i> <span class="hidden">Facebook</span>
+    </a>
+    <a href="https://plus.google.com/share?url=https%3a%2f%2fdavidaramant.github.io%2fpost%2fthe-buddhabrot-part-3%2f" title="Share on Google+"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <i class="fa fa-2x fa-fw fa-google-plus-square" style="margin-left: -8px"></i> <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    <footer class="post-footer">
+        <section class="author">
+    <div class="authorimage" style="background: url(https://davidaramant.github.io/img/avatar.jpg)"></div>
+    <h4>David Aramant</h4>
+    <p class="bio">I work at <a href="https://www.sep.com">SEP</a>.</p>
+    <p class="meta">
+      
+    </p>
+</section>
+    </footer>
+    
+</article>
+
+    </main>
+
+    <footer class="site-footer">
+	<div class="inner">
+		<section class="footer-social">
+      
+      <a href="//twitter.com/davidaramant" target="_blank" title="Twitter"><i class="fa fa-2x fa-fw fa-twitter"></i> <span class="hidden">Twitter</span></a>&nbsp;
+      
+      
+      
+      
+      
+      
+      <a href="//github.com/davidaramant" target="_blank" title="GitHub"><i class="fa fa-2x fa-fw fa-github"></i> <span class="hidden">GitHub</span></a>&nbsp;
+      
+      
+      
+      
+  </section>
+
+		<section class="copyright">&copy; 2017 <a href="https://davidaramant.github.io/">David Aramant</a>. </section>
+	</div>
+</footer>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://davidaramant.github.io/js/index.js"></script>
+<script src="https://davidaramant.github.io/js/smooth-scroll.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+
+
+<script>
+    smoothScroll.init({
+        speed: 800,
+        easing: 'easeInOutCubic',
+        updateURL: false,
+        offset: 125,
+    });
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+</body>
+</html>

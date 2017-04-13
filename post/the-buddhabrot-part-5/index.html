@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>The Buddhabrot Part 5: The Big Reveal &middot; David Aramant</title>
+    <meta name="author" content="David Aramant">
+    
+    <meta name="generator" content="Hugo 0.20" />
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <!-- RSS autodiscovery -->
+    
+
+    <link rel="shortcut icon" href="https://davidaramant.github.io/img/favicon.ico">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://davidaramant.github.io/css/screen.css">
+    <link rel="stylesheet" href="https://davidaramant.github.io/css/github.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/styles/default.min.css">
+    
+
+    
+
+    <!-- Stylesheet for theme color -->
+    <style type="text/css">
+    a, a:visited {color: #f05948;}
+    .pagination a {color: #f05948;}
+    .gist .gist-file .gist-meta a:visited {color: #f05948 !important;}
+    a:focus, a:hover {color: #c62310;}
+    h1.post-title a:focus, h1.post-title a:hover, h1.blog-title a:focus, h1.blog-title a:hover {color: #c62310;}
+    .older-posts:hover, .newer-posts:hover {color: #c62310;}
+</style>
+</head>
+
+<body class="home-template">
+    <header id="site-head">
+	
+	<h1 class="blog-title"><a href="https://davidaramant.github.io/">David Aramant</a></h1>
+	
+	
+	<h1 class="blog-subtitle">Hi! You&rsquo;ve somehow found my blog!</h1>
+	
+</header>
+    
+    
+    <main class="content" role="main">
+    
+<article class="post">
+    <header>
+        <h1 class="post-title">The Buddhabrot Part 5: The Big Reveal</h1>
+        <div class="post-meta">
+            <time datetime="12 April 2017">
+                12 April 2017
+            </time>
+        </div>
+    </header>
+
+    <section class="post-content">
+        
+
+<p>I think it&rsquo;s high time the big version is shown off&hellip;</p>
+
+<h2 id="the-68-7-gigapixel-buddhabrot">The 68.7 Gigapixel Buddhabrot</h2>
+
+<p><a href="https://www.sep.com/labs/buddhabrot">Tada!</a>  You can pan around and use the mouse wheel to zoom in/out.  It should work fine on mobile too.</p>
+
+<p>Thanks to <a href="https://www.sep.com">SEP</a> for being willing to host it.</p>
+
+<h2 id="guided-tour">Guided Tour</h2>
+
+<p>Lets examine some features to back up some of the claims I&rsquo;ve made throughout the series.</p>
+
+<h3 id="the-effects-of-high-iteration-limits">The effects of high iteration limits</h3>
+
+<p>I stated that using higher minimum/maximum iteration limits made the Buddhabrot &ldquo;cooler.&rdquo;  This is what I meant:</p>
+
+<p><img src="/buddhabrot/raindrop.jpg" alt="Raindrop shape in Buddhabrot" /></p>
+
+<p>These odd raindrop-shaped objects and the other &ldquo;swirly&rdquo; feature you&rsquo;ll see aren&rsquo;t really visible if you pick lower bounds.  I <em>think</em> we are seeing the points swirl around in circles a while before they escape, although I haven&rsquo;t investigated this further.</p>
+
+<h3 id="asymmetry">Asymmetry</h3>
+
+<p>Remember how I intentionally didn&rsquo;t mirror the output, despite the Mandelbrot set being symmetrical?  This is a closeup of the middle &ldquo;seam&rdquo; (the line of symmetry runs vertically down the middle) :</p>
+
+<p><img src="/buddhabrot/unsymmetrical.jpg" alt="Closeup of the middle of the Buddhabrot" /></p>
+
+<p>You can see that it&rsquo;s not quite the same on both sides.</p>
+
+<p>Also, philosophically I don&rsquo;t like the idea of mirroring it.  If I&rsquo;m going through the trouble of generating gigabytes of images I want them to at least be different!</p>
+
+<h3 id="shadows">Shadows</h3>
+
+<p>All throughout the Buddhabrot you can see these ghostly shadows fading into nothingness:</p>
+
+<p><img src="/buddhabrot/shadows.jpg" alt="Shadows in the Buddhabrot" /></p>
+
+<p>I don&rsquo;t have much to say about them; I just think it looks cool 😊</p>
+
+<h3 id="the-heart">The Heart</h3>
+
+<p>Towards the top you can see the &ldquo;heart&rdquo; of the Buddhabrot:</p>
+
+<p><img src="/buddhabrot/heart.jpg" alt="Buddhabrot heart" /></p>
+
+<p>If you scroll up from this point you&rsquo;ll see smaller and smaller versions of it - there is an infinite number of hearts!</p>
+
+<h3 id="effects-of-the-number-of-points">Effects of the number of points</h3>
+
+<p>As you explore the Buddhabrot, you&rsquo;ll come across a lot of smaller, less detailed versions of the whole:</p>
+
+<p><img src="/buddhabrot/smaller_version.jpg" alt="Smaller Buddhabrot" /></p>
+
+<p>If I had plotted the trajectories of, oh, maybe an order of magnitude more points, some of the these smaller versions would look a whole lot closer to the bigger one.  Each of these small copies (even the teeny ones with barely any detail) are exact copies of the whole.  If you somehow plotted an infinite number of trajectories at infinite zoom levels, you could keep zooming into these smaller versions and never find the bottom&hellip;</p>
+
+<h3 id="blown-out-regions">Blown-out Regions</h3>
+
+<p>Despite my best efforts, there are some areas that just don&rsquo;t show a lot of detail.  This is most notable around the origin:</p>
+
+<p><img src="/buddhabrot/origin.jpg" alt="Buddhabrot origin region" /></p>
+
+<p>I&rsquo;m not sure there really <em>is</em> more detail to show around this area, but it still feels a bit unsatisfying&hellip;</p>
+
+<h2 id="what-s-next">What&rsquo;s Next?</h2>
+
+<p>Am I done with the Buddhabrot?  A year ago, I would have said &ldquo;probably.&rdquo;  However, preparing for the talk got me thinking about it again, and there&rsquo;s still some areas that could be improved&hellip;</p>
+
+<ul>
+<li><strong>GPU computing</strong> is by far the lowest hanging fruit.  This is something I want to explore more anyway, so it would be a perfect excuse.</li>
+<li>By applying some <strong>tone mapping</strong> concepts there might be a way to bring out more detail in the output.</li>
+<li>Everyone always, <em>always</em> asks me if I&rsquo;m going to make a bigger one.  A terapixel is a nice round number but you <em>really</em> start getting into some headaches:
+
+<ul>
+<li>A terapixel version would have around <em>16 times</em> the image data for&hellip; two more zoom levels?  Hosting 16GB of JPEGs is one thing; 256GB is quite another.</li>
+<li>The time involved goes up substantially too.  For example, the <a href="https://github.com/google/guetzli/">Google Guetzli</a> JPEG encoder can drastically reduce the size of images.  However, they warn that it takes around 1 minute of CPU time for 1 megapixel.  OK, so 1 terapixel of images would take&hellip; over 2 years?  And, whoops, it&rsquo;s not just 1 terapixel because that&rsquo;s only the <em>deepest zoom level</em> - if you count all the images for the other zoom levels it&rsquo;s over 1.3 terapixels of images.</li>
+</ul></li>
+</ul>
+
+<p>We&rsquo;ll see what/if I decide to do&hellip;</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>What I&rsquo;ve hoped you&rsquo;ve taken away from this series is:</p>
+
+<ul>
+<li>Fractals are really neat and the math isn&rsquo;t terribly scary.  I haven&rsquo;t done much of anything math related since I graduated but even I can figure this stuff out.</li>
+<li>Projects like this are a great way to pick up useful skills.  I&rsquo;ve had to break out some frameworks and solutions that would easily be useful on the job.</li>
+</ul>
+
+    </section>
+
+    
+    <section class="post-tags" style="padding-bottom:60px;">
+        <div class="post-meta tags">
+            <i class="fa fa-fw fa-tag"></i>
+            
+                
+                <a href="https://davidaramant.github.io/tags/work-related">Work related </a>
+            
+                
+                <a href="https://davidaramant.github.io/tags/buddhabrot">Buddhabrot </a>
+            
+        </div>
+    </section>
+    
+    
+    <section class="share">
+    <p class="backtotop"><a data-scroll href="#site-head"><i class="fa fa-lg fa-fw fa-angle-double-up"></i></a><a data-scroll class="backtotoptext" href="#site-head"> Back to top</a></p>
+    <p class="info prompt">Share</p>
+    <a href="http://twitter.com/share?text=The%20Buddhabrot%20Part%205%3a%20The%20Big%20Reveal&url=https%3a%2f%2fdavidaramant.github.io%2fpost%2fthe-buddhabrot-part-5%2f" title="Share on Twitter"
+        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <i class="fa fa-2x fa-fw fa-twitter-square"></i> <span class="hidden">Twitter</span>
+    </a>
+    <a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fdavidaramant.github.io%2fpost%2fthe-buddhabrot-part-5%2f" title="Share on Facebook"
+        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <i class="fa fa-2x fa-fw fa-facebook-square" style="margin-left: -8px"></i> <span class="hidden">Facebook</span>
+    </a>
+    <a href="https://plus.google.com/share?url=https%3a%2f%2fdavidaramant.github.io%2fpost%2fthe-buddhabrot-part-5%2f" title="Share on Google+"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <i class="fa fa-2x fa-fw fa-google-plus-square" style="margin-left: -8px"></i> <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    <footer class="post-footer">
+        <section class="author">
+    <div class="authorimage" style="background: url(https://davidaramant.github.io/img/avatar.jpg)"></div>
+    <h4>David Aramant</h4>
+    <p class="bio">I work at <a href="https://www.sep.com">SEP</a>.</p>
+    <p class="meta">
+      
+    </p>
+</section>
+    </footer>
+    
+</article>
+
+    </main>
+
+    <footer class="site-footer">
+	<div class="inner">
+		<section class="footer-social">
+      
+      <a href="//twitter.com/davidaramant" target="_blank" title="Twitter"><i class="fa fa-2x fa-fw fa-twitter"></i> <span class="hidden">Twitter</span></a>&nbsp;
+      
+      
+      
+      
+      
+      
+      <a href="//github.com/davidaramant" target="_blank" title="GitHub"><i class="fa fa-2x fa-fw fa-github"></i> <span class="hidden">GitHub</span></a>&nbsp;
+      
+      
+      
+      
+  </section>
+
+		<section class="copyright">&copy; 2017 <a href="https://davidaramant.github.io/">David Aramant</a>. </section>
+	</div>
+</footer>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://davidaramant.github.io/js/index.js"></script>
+<script src="https://davidaramant.github.io/js/smooth-scroll.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+
+
+<script>
+    smoothScroll.init({
+        speed: 800,
+        easing: 'easeInOutCubic',
+        updateURL: false,
+        offset: 125,
+    });
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+</body>
+</html>

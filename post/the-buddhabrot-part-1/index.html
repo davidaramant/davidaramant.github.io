@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>The Buddhabrot Part 1: What is the Mandelbrot set? &middot; David Aramant</title>
+    <meta name="author" content="David Aramant">
+    
+    <meta name="generator" content="Hugo 0.20" />
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <!-- RSS autodiscovery -->
+    
+
+    <link rel="shortcut icon" href="https://davidaramant.github.io/img/favicon.ico">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://davidaramant.github.io/css/screen.css">
+    <link rel="stylesheet" href="https://davidaramant.github.io/css/github.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/styles/default.min.css">
+    
+
+    
+
+    <!-- Stylesheet for theme color -->
+    <style type="text/css">
+    a, a:visited {color: #f05948;}
+    .pagination a {color: #f05948;}
+    .gist .gist-file .gist-meta a:visited {color: #f05948 !important;}
+    a:focus, a:hover {color: #c62310;}
+    h1.post-title a:focus, h1.post-title a:hover, h1.blog-title a:focus, h1.blog-title a:hover {color: #c62310;}
+    .older-posts:hover, .newer-posts:hover {color: #c62310;}
+</style>
+</head>
+
+<body class="home-template">
+    <header id="site-head">
+	
+	<h1 class="blog-title"><a href="https://davidaramant.github.io/">David Aramant</a></h1>
+	
+	
+	<h1 class="blog-subtitle">Hi! You&rsquo;ve somehow found my blog!</h1>
+	
+</header>
+    
+    
+    <main class="content" role="main">
+    
+<article class="post">
+    <header>
+        <h1 class="post-title">The Buddhabrot Part 1: What is the Mandelbrot set?</h1>
+        <div class="post-meta">
+            <time datetime="06 April 2017">
+                06 April 2017
+            </time>
+        </div>
+    </header>
+
+    <section class="post-content">
+        
+
+<p>At the inaugural <a href="https://indycode.amegala.com/">Indy.Code()</a> conference I presented on how I generated a 68.7 gigapixel rendering of the Buddhabrot fractal.  For now, all you need to know that it&rsquo;s this thing&hellip;</p>
+
+<p><img src="/buddhabrot/normal.jpg" alt="A small Buddhabrot" /></p>
+
+<p>&hellip;but really, really gigantic.</p>
+
+<p>In this series I&rsquo;ll explain what the Buddhabrot is and how I made my version.</p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>I was introduced to the Buddhabrot in a college class I took about fractals (technically, it was about <em>Chaotic Dynamical Systems</em> but I don&rsquo;t remember too much about that..).  A few years ago at <a href="https://www.sep.com">SEP</a> we introduced <a href="https://www.sep.com/labs/hackathon/">Hackathon Weekends</a>.  The Buddhabrot seemed like the perfect topic for a weekend project so we (I managed to convince two others to help) set out to render a 500 megapixel version.  This was heavily inspired by <a href="http://erleuchtet.org/2010/07/ridiculously-large-buddhabrot.html">Johann Korndoerfer&rsquo;s 500 megapixel version</a> he made in LISP.  I decided to use C#/.NET because that&rsquo;s what I&rsquo;m most comfortable with.</p>
+
+<p>We succeeded!  Although impressive, I was a bit unsatisfied with all the shortcuts we had to take to accomplish anything in a weekend. I decided to revisit it in a second Hackathon and raised it to 625 megapixels.  That might seem like a modest increase, but the 500 megapixels was a hard limit with the original method.  <em>(As it turns out, the .NET Image class will throw an undocumented Win32 exception if you try to create an image larger than 500MP.  Geez, don&rsquo;t they test anything over there at Microsoft!!!)</em></p>
+
+<p><img src="/buddhabrot/history_of_progress.png" alt="History of progress" /></p>
+
+<p>At this point I was hooked so I pushed it up to 10 gigapixels.  I immediately realized my mistake and pushed it to the largest possible version I could create without radically altering my approach - 68.7 gigapixels!</p>
+
+<h4 id="aside-68-7-gigapixels-what-a-weird-number">Aside - 68.7 gigapixels?  What a weird number</h4>
+
+<p>Now, the number 68.7 might jump out at you because it doesn&rsquo;t sound very computer-sciencey.  How you refer to the size depends on whether you consider a kilopixel to be 1,000 or 1,024 pixels.  If you go by 1,024, the size is actually 64 gigapixels.  Since the only people who actually <em>care</em> about megapixels are camera manufacturers (and they cheat as much as they can get away with) I&rsquo;ll go for the more impressive number.</p>
+
+<p>In unambiguous terms, the final rendering is 68,719,476,736 pixels (262,144 by 262,144).</p>
+
+<h2 id="what-is-a-fractal">What is a Fractal?</h2>
+
+<p>A <a href="https://en.wikipedia.org/wiki/Fractal">fractal</a> is defined by <em>self similarity</em> - parts of the object are similar to the whole.</p>
+
+<p>A classic example of a fractal that you may have seen is the <strong>Sierpinski Triangle</strong>:
+<img src="/buddhabrot/Sierpinski_triangle.png" alt="Sierpinski Triangle" /></p>
+
+<p>Fractals have sometimes been described as &ldquo;the mathematics of nature&rdquo; because this concept often shows up in the real world.  Take the example below:
+<img src="/buddhabrot/comet_vs_dust.jpg" alt="Comet vs Dust" /></p>
+
+<p>On the left, we have the comet that the <em>Rosetta</em> spacecraft landed on in 2014.  On the right, grains of dust under extreme magnification.  Even though the scales are wildly different they look pretty similar!</p>
+
+<p>Fractals <em>do</em> have real-world applications, but the one we&rsquo;ll be looking at in this series doesn&rsquo;t do too much other than look cool.</p>
+
+<h2 id="what-is-the-mandelbrot-set">What is the Mandelbrot Set?</h2>
+
+<p>The Mandelbrot set has been called &ldquo;the king of fractals.&rdquo;  We&rsquo;ll have to use a bit of math to explain what it is, but don&rsquo;t worry, there won&rsquo;t be any scary theoretical stuff.</p>
+
+<h3 id="complex-numbers">Complex Numbers</h3>
+
+<p>The most complicated mathematical concept we have to introduce is <a href="https://en.wikipedia.org/wiki/Complex_number">complex numbers</a>.  A complex number is written as <strong>a + b<em>i</em></strong> where <strong>a</strong> is a real number and <strong>b</strong> is an imaginary number (remember that <em>i</em> is the square root of negative one).</p>
+
+<p>Just like &ldquo;normal&rdquo; numbers, you can add and multiply complex numbers.  These rules are very straightforward, but you can look those up yourself if you are interested. The important thing to keep in mind is that a complex number has two independent components and that addition/multiplication isn&rsquo;t quite the same as a normal number.</p>
+
+<h3 id="the-complex-plane">The Complex Plane</h3>
+
+<p>Since complex numbers have two different parts we can draw them in two dimensions.  Mathematicians call this the <strong>complex plane</strong>:</p>
+
+<p><img src="/buddhabrot/complex_plane.png" alt="Complex Plane" /></p>
+
+<p>Here we&rsquo;re looking at a circle of radius 2 around the origin (yes, the value of 2 is special, but we&rsquo;re not going to go into why).  The real numbers go across the X-axis and the imaginary numbers are on the Y-axis.  See the white dot?  That&rsquo;s -1 + 0.25<em>i</em>, as an example.</p>
+
+<h3 id="the-magic-function">The Magic Function</h3>
+
+<p>Let&rsquo;s introduce a function:</p>
+
+<p><img src="/buddhabrot/mandelbrot_set_equation.gif" alt="z = z*z +c" /></p>
+
+<p>where <em>z</em> and <em>c</em> are both complex numbers.  We&rsquo;ll pick any starting point in the gray circle of radius 2 and call it <em>c</em>.  Starting with <em>z</em> = 0, the function says that to calculate the next <em>z</em> value, we take the previous one, square it, and add <em>c</em> to it.  This generates an infinite series of complex numbers.</p>
+
+<p>Something interesting happens with those numbers:</p>
+
+<ul>
+<li>For some starting <em>c</em> values, the numbers we generate will eventually escape the circle of radius 2 and go flying off to infinity, never to return.</li>
+<li>For other <em>c</em> values, the series of points will <em>never</em> leave the circle of radius 2 <em>even under infinite iteration</em>.</li>
+</ul>
+
+<p>That last part is pretty weird!  What do the the starting points look like that will never escape?</p>
+
+<p><img src="/buddhabrot/complex_plane_mandelbrot.png" alt="Mandelbrot Set" /></p>
+
+<p>We&rsquo;ve just found the <a href="https://en.wikipedia.org/wiki/Mandelbrot_set">Mandelbrot set</a>.</p>
+
+<h3 id="hold-on-infinite-iteration">Hold on, &ldquo;infinite iteration?&rdquo;</h3>
+
+<p>I used a bad word in that definition - computers don&rsquo;t like the concept of <em>infinity</em> very much.  I mean, they&rsquo;re happy enough to do something forever, but us impatient humans aren&rsquo;t very happy waiting around that long.</p>
+
+<p>So, like the lazy programmers we are, we&rsquo;ll pick a value for &ldquo;infinity&rdquo; and leave the theoretical perfection to the mathematicians.  As it turns out, the value we pick changes the output considerably:</p>
+
+<p><img src="/buddhabrot/mandelbrot_limits.png" alt="Mandelbrot Set with differing upper limits" /></p>
+
+<p>Here we have three renderings using values of 5, 10, and 15 as the maximum limit.  If the points are still within the circle after that many iterations, we assume they are in the Mandelbrot Set.  As you can see, raising the limit gets us a more defined image.</p>
+
+<h3 id="for-context">For context&hellip;</h3>
+
+<p>To make it really concrete, the code to do the important bits we&rsquo;ve covered so far is as follows:</p>
+
+<pre><code class="language-cs">public bool IsInMandelbrotSet(Complex c, int iterationLimit)
+{
+    var z = Complex.Zero;
+
+    for (int i = 0; i &lt; iterationLimit; i++)
+    {
+        z = z * z + c;
+
+        // check if the point has escaped the circle of radius 2
+        if (z.Magnitude * z.Magnitude &gt; 4)
+            return false;
+    }
+
+    return true;
+}
+</code></pre>
+
+<p>Not too complicated.  The only thing to keep in mind is that multiplication and addition with complex numbers is slightly more complicated than it appears.  The check to see whether we&rsquo;ve escaped the circle of radius 2 also looks scarier than it is - we&rsquo;re just using the <a href="https://en.wikipedia.org/wiki/Pythagorean_theorem">Pythagorean theorem</a>.</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>So far we&rsquo;ve been introduced to the Mandelbrot Set.  In the <a href="/post/the-buddhabrot-part-2">next part</a> we&rsquo;ll start looking into how to visualize it, which will eventually bring us to the Buddhabrot.</p>
+
+    </section>
+
+    
+    <section class="post-tags" style="padding-bottom:60px;">
+        <div class="post-meta tags">
+            <i class="fa fa-fw fa-tag"></i>
+            
+                
+                <a href="https://davidaramant.github.io/tags/work-related">Work related </a>
+            
+                
+                <a href="https://davidaramant.github.io/tags/buddhabrot">Buddhabrot </a>
+            
+        </div>
+    </section>
+    
+    
+    <section class="share">
+    <p class="backtotop"><a data-scroll href="#site-head"><i class="fa fa-lg fa-fw fa-angle-double-up"></i></a><a data-scroll class="backtotoptext" href="#site-head"> Back to top</a></p>
+    <p class="info prompt">Share</p>
+    <a href="http://twitter.com/share?text=The%20Buddhabrot%20Part%201%3a%20What%20is%20the%20Mandelbrot%20set%3f&url=https%3a%2f%2fdavidaramant.github.io%2fpost%2fthe-buddhabrot-part-1%2f" title="Share on Twitter"
+        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <i class="fa fa-2x fa-fw fa-twitter-square"></i> <span class="hidden">Twitter</span>
+    </a>
+    <a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fdavidaramant.github.io%2fpost%2fthe-buddhabrot-part-1%2f" title="Share on Facebook"
+        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <i class="fa fa-2x fa-fw fa-facebook-square" style="margin-left: -8px"></i> <span class="hidden">Facebook</span>
+    </a>
+    <a href="https://plus.google.com/share?url=https%3a%2f%2fdavidaramant.github.io%2fpost%2fthe-buddhabrot-part-1%2f" title="Share on Google+"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <i class="fa fa-2x fa-fw fa-google-plus-square" style="margin-left: -8px"></i> <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    <footer class="post-footer">
+        <section class="author">
+    <div class="authorimage" style="background: url(https://davidaramant.github.io/img/avatar.jpg)"></div>
+    <h4>David Aramant</h4>
+    <p class="bio">I work at <a href="https://www.sep.com">SEP</a>.</p>
+    <p class="meta">
+      
+    </p>
+</section>
+    </footer>
+    
+</article>
+
+    </main>
+
+    <footer class="site-footer">
+	<div class="inner">
+		<section class="footer-social">
+      
+      <a href="//twitter.com/davidaramant" target="_blank" title="Twitter"><i class="fa fa-2x fa-fw fa-twitter"></i> <span class="hidden">Twitter</span></a>&nbsp;
+      
+      
+      
+      
+      
+      
+      <a href="//github.com/davidaramant" target="_blank" title="GitHub"><i class="fa fa-2x fa-fw fa-github"></i> <span class="hidden">GitHub</span></a>&nbsp;
+      
+      
+      
+      
+  </section>
+
+		<section class="copyright">&copy; 2017 <a href="https://davidaramant.github.io/">David Aramant</a>. </section>
+	</div>
+</footer>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://davidaramant.github.io/js/index.js"></script>
+<script src="https://davidaramant.github.io/js/smooth-scroll.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+
+
+<script>
+    smoothScroll.init({
+        speed: 800,
+        easing: 'easeInOutCubic',
+        updateURL: false,
+        offset: 125,
+    });
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+</body>
+</html>

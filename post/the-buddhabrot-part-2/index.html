@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>The Buddhabrot Part 2: What is the Buddhabrot? &middot; David Aramant</title>
+    <meta name="author" content="David Aramant">
+    
+    <meta name="generator" content="Hugo 0.20" />
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <!-- RSS autodiscovery -->
+    
+
+    <link rel="shortcut icon" href="https://davidaramant.github.io/img/favicon.ico">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://davidaramant.github.io/css/screen.css">
+    <link rel="stylesheet" href="https://davidaramant.github.io/css/github.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/styles/default.min.css">
+    
+
+    
+
+    <!-- Stylesheet for theme color -->
+    <style type="text/css">
+    a, a:visited {color: #f05948;}
+    .pagination a {color: #f05948;}
+    .gist .gist-file .gist-meta a:visited {color: #f05948 !important;}
+    a:focus, a:hover {color: #c62310;}
+    h1.post-title a:focus, h1.post-title a:hover, h1.blog-title a:focus, h1.blog-title a:hover {color: #c62310;}
+    .older-posts:hover, .newer-posts:hover {color: #c62310;}
+</style>
+</head>
+
+<body class="home-template">
+    <header id="site-head">
+	
+	<h1 class="blog-title"><a href="https://davidaramant.github.io/">David Aramant</a></h1>
+	
+	
+	<h1 class="blog-subtitle">Hi! You&rsquo;ve somehow found my blog!</h1>
+	
+</header>
+    
+    
+    <main class="content" role="main">
+    
+<article class="post">
+    <header>
+        <h1 class="post-title">The Buddhabrot Part 2: What is the Buddhabrot?</h1>
+        <div class="post-meta">
+            <time datetime="07 April 2017">
+                07 April 2017
+            </time>
+        </div>
+    </header>
+
+    <section class="post-content">
+        
+
+<p>In the <a href="/post/the-buddhabrot-part-2">last part</a> we learned what the Mandelbrot set is.</p>
+
+<h2 id="visualizing-the-mandelbrot-set">Visualizing the Mandelbrot Set</h2>
+
+<p>With what we&rsquo;ve talked about so far, we can make a very crisp, black-and-white version:</p>
+
+<p><img src="/buddhabrot/crisp_mandelbrot.png" alt="Crisp B/W Mandelbrot" /></p>
+
+<p>That&rsquo;s cool and all, but normally when you see the Mandelbrot set there&rsquo;s more going on than this.  What info do we have to visualize?</p>
+
+<h3 id="escape-time">Escape Time</h3>
+
+<p>One thing we can visualize is the <strong>escape time</strong> - how many iterations it took for the point to escape the circle and bail out of the loop:</p>
+
+<p><img src="/buddhabrot/escape_time_bw.png" alt="Escape Time visualized in Black and White" /></p>
+
+<p>Here I&rsquo;m just visualizing odd escape times in black and even ones in white (the set itself is drawn in white to match the previous picture).  You can see that a fair chunk of the circle only takes one iteration before it fails the check, a tighter oval takes two, etc.  As we get closer to the border of the Mandelbrot set, it takes longer and longer for the point to break out of the loop.</p>
+
+<p>This is certainly more interesting, but it <em>still</em> doesn&rsquo;t look much like how you normally see it.</p>
+
+<h3 id="escape-time-fancier">Escape Time - Fancier!</h3>
+
+<p><img src="/buddhabrot/escape_time_color.png" alt="Escape Time visualized with Color" /></p>
+
+<p>This is more like it!  Here I&rsquo;ve taken the exact same data we saw on the previous image and mapped it to a simple color ramp instead.</p>
+
+<p>Although this is a very simplistic version, visualizing the escape time is one of the most common ways you see the Mandelbrot set (or, more accurately, the points <em>around</em> the Mandelbrot set).  For whatever reason, it seems to be extremely popular to visualize the poor thing using a 60s tie-dye or 70s van art aesthetic (don&rsquo;t ask me).  I&rsquo;m sure you can already think of ways to make the above image more visually impressive by zooming in more, picking different colors, smoothing out the color gradients, etc&hellip;</p>
+
+<h3 id="is-there-any-other-data-we-can-visualize">Is there any other data we can visualize?</h3>
+
+<p>Let&rsquo;s go back and review what we&rsquo;re doing: for a given input point, we&rsquo;re going to generate a series of points until it escapes (or not) the circle of radius 2.  That series of points are sometimes referred to as the <strong>trajectory</strong> of the starting point.</p>
+
+<p>Let&rsquo;s visualize a trajectory:</p>
+
+<p><img src="/buddhabrot/trajectory.png" alt="Trajectory of a point" /></p>
+
+<p>(Note that this is a totally made up example!  If you plot the trajectory of that real point it wouldn&rsquo;t look like this)</p>
+
+<p>Our completely-made-up trajectory starts on the left side and under iteration the points move rightwards until one escapes the circle.  What if we used information from the trajectory itself?</p>
+
+<h3 id="trajectory-visualizations">Trajectory Visualizations</h3>
+
+<p>Let&rsquo;s base the color intensity from the distance of the closest point in the trajectory to the origin, and the color hue from the angle of that point from the real axis (X-axis):</p>
+
+<p><img src="/buddhabrot/trajectory_visualization.png" alt="Trajectory Mandelbrot Visualization" /></p>
+
+<p>Well, uh, let&rsquo;s try to ignore that what I did ended up looking like an abstract Oscar Mayer nightmare and notice that we are getting some much weirder output.  All those lines everywhere are called <a href="https://en.wikipedia.org/wiki/Pickover_stalk">Pickover stalks</a>, which is another rabbit hole you can explore.</p>
+
+<p>The point I want to emphasis is that all these visualizations are using the same data that we&rsquo;ve already seen how to generate.  The complex nature of the output comes from the magical nature of the Mandelbrot set itself; how complicated you want to get in your visualization technique is up to you.</p>
+
+<h2 id="ok-so-what-about-the-buddhabrot">OK, so what about the Buddhabrot?</h2>
+
+<p>With the information we&rsquo;ve learned we can now introduce the Buddhabrot:</p>
+
+<p><img src="/buddhabrot/buddhabrot.png" alt="Buddhabrot" /></p>
+
+<p>First of all you&rsquo;ll notice that the Buddhabrot is always displayed rotated 90 degrees (it looks nicer that way).  The Buddhabrot technique was first described by <a href="http://superliminal.com/fractals/bbrot/bbrot.htm">Melinda Green</a> in 1993.  It&rsquo;s kinda-sorta reminiscent of Buddhist/Hindu artwork and if you squint at it <em>just</em> right you might see a kneeling Buddha figure, hence the name.</p>
+
+<p>The Buddhabrot is <em>a density plot of trajectories from points that are not in the Mandelbrot set</em>.</p>
+
+<p>Lets unpack that:</p>
+
+<ul>
+<li>We&rsquo;re going to start with only the points that are <em>not</em> in the Mandelbrot set; i.e. they escape the circle of radius 2 after some number of iterations.</li>
+<li>That iterated series of points is called the trajectory of the starting point.</li>
+<li>We&rsquo;re going to take those trajectories and keep track of which pixels they visit.  For each point in a trajectory, we&rsquo;ll figure out the pixel location that it corresponds to and increment that location by 1.</li>
+<li>The final image is a visualization of how often each pixel location was visited by a trajectory.  In the above image, brighter pixels were visited more often, while the black areas were totally skipped.</li>
+</ul>
+
+<h3 id="why-do-we-only-plot-the-numbers-that-are-not-in-the-mandelbrot-set">Why do we only plot the numbers that are <em>not</em> in the Mandelbrot set?</h3>
+
+<p>If you reverse it and only plot points <em>in</em> the set, you&rsquo;ll wind up with the <strong>Anti-Buddhabrot</strong>:</p>
+
+<p><img src="/buddhabrot/anti-buddhabrot.png" alt="Anti-Buddhabrot" /></p>
+
+<p>This visualization is kinda interesting too (my rendering doesn&rsquo;t quite do it justice), but it&rsquo;s way more symmetrical and less chaotic.</p>
+
+<h2 id="minimum-iteration-depth">Minimum Iteration Depth</h2>
+
+<p>Remember how the maximum iteration limit changed the appearance of the Mandelbrot set?  Well, for the Buddhabrot, we also care about the <em>minimum</em> iteration limit:</p>
+
+<p><img src="/buddhabrot/buddhabrot_minimums.jpg" alt="Buddhabrot with different minimum iterations" /></p>
+
+<p>These are different renderings with a minimum escape count of 20, 100, and 1000.  Any point that escapes the circle <em>before</em> that minimum limit is discarded.  As you can see, increasing the minimum limit makes the Buddhabrot &lsquo;crisper&rsquo; and reduces some of the noise.  If you <em>really</em> crank up the minimum limit, you&rsquo;ll start seeing some really cool stuff, as we&rsquo;ll find out later&hellip;</p>
+
+<h3 id="back-to-the-code">Back to the code&hellip;</h3>
+
+<p>Sometimes it&rsquo;s clearer to read code instead of words, so here&rsquo;s a simple method to check whether a complex number should be plotted in the Buddhabrot:</p>
+
+<pre><code class="language-cs">public bool IsBuddhabrotPoint(Complex c, int minLimit, int maxLimit)
+{
+    var z = Complex.Zero;
+
+    for (int i = 0; i &lt; maxLimit; i++)
+    {
+        z = z * z + c;
+
+        // check if the point has escaped the circle of radius 2
+        if (z.Magnitude * z.Magnitude &gt; 4)
+        {
+            // Filter by the minimum iteration limit too!
+            // Points that escape too fast are 'noisey'
+            return i &gt;= minLimit;
+        }
+    }
+
+    // Point never escaped, so we think it's in the Mandelbrot set
+    return false;
+}
+</code></pre>
+
+<h3 id="nebulabrot">Nebulabrot</h3>
+
+<p>You can actually utilize the effects of changing the minimum iteration limit to make yet <em>another</em> variation called the <strong>Nebulabrot</strong>:</p>
+
+<p><img src="/buddhabrot/nebulabrot.png" alt="Nebulabrot" /></p>
+
+<p>This looks pretty &lsquo;spacey&rsquo; because it&rsquo;s similar to how NASA generates false-color images of things like galaxies from radio waves - each color channel is a rendering of the Buddabrot with a different minimum iteration limit.</p>
+
+<p>If you&rsquo;re wondering about those weird ghostly boxes everywhere - well, they&rsquo;re actually artifacts from an optimization we&rsquo;ll cover in a later part.  If I find the motivation I should probably re-render this guy to get rid of those.</p>
+
+<h2 id="effects-of-the-number-of-points">Effects of the Number of Points</h2>
+
+<p>In addition to the maximum / minimum iteration limits, another variable that is very important for the Buddhabrot is the <strong>number of trajectories we plot</strong>:</p>
+
+<p><img src="/buddhabrot/noisy_buddhabrot.png" alt="Noisy Buddhabrot" /></p>
+
+<p>Remember that we&rsquo;re visualizing a density map of how many times each pixel location has been visited.  If we don&rsquo;t plot enough points, our map will be extremely noisy like the above image.</p>
+
+<h2 id="summary-the-buddhabrot-is-slow">Summary - The Buddhabrot is Slow!</h2>
+
+<p>Let&rsquo;s wrap up this part by summarizing what we&rsquo;ve learned so far:</p>
+
+<ul>
+<li>A high minimum iteration limit will result in a cooler Buddhabrot</li>
+<li>The Buddhabrot needs a lot of points to not look noisy</li>
+<li>Unlike the normal Mandelbrot visualization, there is not a 1:1 mapping between points and pixels</li>
+</ul>
+
+<p>A normal Mandelbrot visualization can be done in real-time (or close to it).  There are lots of fractal viewer programs you can download to play around with it.  One popular thing to do is to zoom in at incredible magnifications.  This is feasible because every pixel in the output corresponds to one complex number.  Making a rendering at 1x or 100,000,000x magnification is the same effort (minus any overhead from using an arbitrary-precision data type) - it&rsquo;s the same number of pixels, so it&rsquo;s the same number of complex numbers to iterate.</p>
+
+<p>Not so for the Buddhabrot.  Because we don&rsquo;t know which starting points will contribute to a particular pixel location, zooming in real-time is not feasible.  You <em>can</em> estimate which points you should iterate to get an image using technique like the Metropolis-Hastings algorithm, but that&rsquo;s pretty advanced.  It&rsquo;s actually much conceptually simpler to pre-render a gigantic version of it and zoom in after-the-fact.</p>
+
+<p>My particular version has the following stats:</p>
+
+<ul>
+<li>Minimum iteration limit: 1,000,000</li>
+<li>Maximum iteration limit: 5,000,000</li>
+<li>Size: 68,719,476,736 pixels (262,144 x 262,144)</li>
+</ul>
+
+<p>That&rsquo;s a lot of work!  If we want to get this done before the heat death of the universe we&rsquo;ll have to <a href="/post/the-buddhabrot-part-3">some ways of speeding it up&hellip;</a></p>
+
+    </section>
+
+    
+    <section class="post-tags" style="padding-bottom:60px;">
+        <div class="post-meta tags">
+            <i class="fa fa-fw fa-tag"></i>
+            
+                
+                <a href="https://davidaramant.github.io/tags/work-related">Work related </a>
+            
+                
+                <a href="https://davidaramant.github.io/tags/buddhabrot">Buddhabrot </a>
+            
+        </div>
+    </section>
+    
+    
+    <section class="share">
+    <p class="backtotop"><a data-scroll href="#site-head"><i class="fa fa-lg fa-fw fa-angle-double-up"></i></a><a data-scroll class="backtotoptext" href="#site-head"> Back to top</a></p>
+    <p class="info prompt">Share</p>
+    <a href="http://twitter.com/share?text=The%20Buddhabrot%20Part%202%3a%20What%20is%20the%20Buddhabrot%3f&url=https%3a%2f%2fdavidaramant.github.io%2fpost%2fthe-buddhabrot-part-2%2f" title="Share on Twitter"
+        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <i class="fa fa-2x fa-fw fa-twitter-square"></i> <span class="hidden">Twitter</span>
+    </a>
+    <a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fdavidaramant.github.io%2fpost%2fthe-buddhabrot-part-2%2f" title="Share on Facebook"
+        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <i class="fa fa-2x fa-fw fa-facebook-square" style="margin-left: -8px"></i> <span class="hidden">Facebook</span>
+    </a>
+    <a href="https://plus.google.com/share?url=https%3a%2f%2fdavidaramant.github.io%2fpost%2fthe-buddhabrot-part-2%2f" title="Share on Google+"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <i class="fa fa-2x fa-fw fa-google-plus-square" style="margin-left: -8px"></i> <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    <footer class="post-footer">
+        <section class="author">
+    <div class="authorimage" style="background: url(https://davidaramant.github.io/img/avatar.jpg)"></div>
+    <h4>David Aramant</h4>
+    <p class="bio">I work at <a href="https://www.sep.com">SEP</a>.</p>
+    <p class="meta">
+      
+    </p>
+</section>
+    </footer>
+    
+</article>
+
+    </main>
+
+    <footer class="site-footer">
+	<div class="inner">
+		<section class="footer-social">
+      
+      <a href="//twitter.com/davidaramant" target="_blank" title="Twitter"><i class="fa fa-2x fa-fw fa-twitter"></i> <span class="hidden">Twitter</span></a>&nbsp;
+      
+      
+      
+      
+      
+      
+      <a href="//github.com/davidaramant" target="_blank" title="GitHub"><i class="fa fa-2x fa-fw fa-github"></i> <span class="hidden">GitHub</span></a>&nbsp;
+      
+      
+      
+      
+  </section>
+
+		<section class="copyright">&copy; 2017 <a href="https://davidaramant.github.io/">David Aramant</a>. </section>
+	</div>
+</footer>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://davidaramant.github.io/js/index.js"></script>
+<script src="https://davidaramant.github.io/js/smooth-scroll.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+
+
+<script>
+    smoothScroll.init({
+        speed: 800,
+        easing: 'easeInOutCubic',
+        updateURL: false,
+        offset: 125,
+    });
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+</body>
+</html>
