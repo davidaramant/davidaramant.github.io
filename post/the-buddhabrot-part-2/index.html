@@ -194,7 +194,7 @@
 
 <p>This looks pretty &lsquo;spacey&rsquo; because it&rsquo;s similar to how NASA generates false-color images of things like galaxies from radio waves - each color channel is a rendering of the Buddabrot with a different minimum iteration limit.</p>
 
-<p>If you&rsquo;re wondering about those weird ghostly boxes everywhere - well, they&rsquo;re actually artifacts from an optimization we&rsquo;ll cover in a later part.  If I find the motivation I should probably re-render this guy to get rid of those, but for a much more impressive version, check out the one by <a href="http://nebula.scottandmichelle.net/nebula/index.html">Scott Seligman</a> (I don&rsquo;t think I can link to the Nebulabrot version directly, but click the &ldquo;Normal&rdquo; option in the top left).</p>
+<p>If you&rsquo;re wondering about those weird ghostly boxes everywhere - well, they&rsquo;re actually artifacts from an optimization we&rsquo;ll cover in a later part.  If I find the motivation I should probably re-render this guy to get rid of those, but for a much more impressive version, check out the one by <a href="http://nebula.scottandmichelle.net/nebula/index.html#tricolor">Scott Seligman</a>.</p>
 
 <h2 id="effects-of-the-number-of-points">Effects of the Number of Points</h2>
 
@@ -202,7 +202,7 @@
 
 <p><img src="/buddhabrot/noisy_buddhabrot.png" alt="Noisy Buddhabrot" /></p>
 
-<p>Remember that we&rsquo;re visualizing a density map of how many times each pixel location has been visited.  If we don&rsquo;t plot enough points, our map will be extremely noisy like the above image.  The above image might also be what happens if you try to simply iterate over every pixel location and plot the trajectory of the corresponding point.  We need <em>lots</em> more points than that, which is why we have pick random starting points (and lots of them!).</p>
+<p>Remember that we&rsquo;re visualizing a density map of how many times each pixel location has been visited.  If we don&rsquo;t plot enough points, our map will be extremely noisy like the above image.  The above image might also be what happens if you try to simply iterate over every pixel location and plot the trajectory of the corresponding point.  We need <em>a lot</em> more points than that, which is why we have pick random starting points (you <em>can</em> estimate which points you should iterate to get an image using a technique like the Metropolis-Hastings algorithm, but that&rsquo;s a pretty advanced topic that I haven&rsquo;t delved into much).</p>
 
 <h2 id="summary-the-buddhabrot-is-slow">Summary - The Buddhabrot is Slow!</h2>
 
@@ -216,7 +216,7 @@
 
 <p>A normal Mandelbrot visualization can be done in real-time (or close to it).  There are lots of fractal viewer programs you can download to play around with it.  One popular thing to do is to zoom in at incredible magnifications, which is feasible because every pixel in the output corresponds to one complex number.  Making a rendering at 1x or 100,000,000x magnification is the same effort (minus any overhead from using an arbitrary-precision data type) - it&rsquo;s the same number of pixels, so it&rsquo;s the same number of complex numbers to iterate.</p>
 
-<p>Not so for the Buddhabrot.  Because we don&rsquo;t know which starting points will contribute to a particular pixel location, zooming in real-time is not feasible.  You <em>can</em> estimate which points you should iterate to get an image using technique like the Metropolis-Hastings algorithm, but that&rsquo;s a pretty advanced topic that I haven&rsquo;t delved into much.  It&rsquo;s actually much conceptually simpler to pre-render a gigantic version of it and zoom in after-the-fact.  Since we don&rsquo;t know (yet!) where the points are that contribute to a particular pixel, we pick the starting points at random from inside the circle.</p>
+<p>Not so for the Buddhabrot.  Because we don&rsquo;t know which starting points will contribute to a particular pixel location, zooming in real-time is not feasible.  It&rsquo;s actually much conceptually simpler to pre-render a gigantic version of it and zoom in after-the-fact.  Since we don&rsquo;t know (yet!) where the points are that contribute to a particular pixel, we pick the starting points at random from inside the circle.</p>
 
 <p>My particular version has the following stats:</p>
 
