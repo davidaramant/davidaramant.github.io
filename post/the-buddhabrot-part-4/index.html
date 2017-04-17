@@ -67,7 +67,17 @@
 
 <p>OK - we&rsquo;ve <a href="/post/the-buddhabrot-part-3">drastically reduced the amount of work we have to do</a>, so now let&rsquo;s try to optimize what&rsquo;s left as much as possible.</p>
 
-<h4 id="a-note-on-benchmarks">A note on benchmarks&hellip;</h4>
+<h2 id="series-overview">Series Overview</h2>
+
+<ul>
+<li><a href="/post/the-buddhabrot-part-1">Part 1 - What is the Mandelbrot set?</a></li>
+<li><a href="/post/the-buddhabrot-part-2">Part 2 - What is the Buddhabrot?</a></li>
+<li><a href="/post/the-buddhabrot-part-3">Part 3 - Algorithmic Optimizations</a></li>
+<li>Part 4 - Code Optimizations</li>
+<li><a href="/post/the-buddhabrot-part-5">Part 5 - The Big Reveal</a></li>
+</ul>
+
+<h3 id="a-note-on-benchmarks">A note on benchmarks&hellip;</h3>
 
 <p>Benchmarks are <em>hard</em>.</p>
 
@@ -82,16 +92,6 @@
 <p><img src="/buddhabrot/benchmarkdotnet_logo.png" alt="BenchmarkDotNet logo" /></p>
 
 <p>Even with tools like this, it can be pretty challenging coming up with realistic scenarios.  When I dusted off my fractal code to prepare for my talk, some of the improved benchmarks I wrote didn&rsquo;t remotely match what I had done just a year earlier (I think my earlier attempts were far too artificial).  I can only say that the results I&rsquo;m presenting are what I saw on my machine with my code.  Your results may vary.</p>
-
-<h3 id="is-brent-s-algorithm-worth-it">Is Brent&rsquo;s Algorithm worth it?</h3>
-
-<p>Remember this thing?  Let&rsquo;s actually measure the impact of using a cycle detection algorithm when finding Buddhabrot points:</p>
-
-<p><img src="/buddhabrot/brents_algorithm_benchmark.png" alt="Brent's Algorithm Benchmark" /></p>
-
-<p>Welp.</p>
-
-<p>To be fair, cycle detection is probably useful for other Mandelbrot scenarios, but in our case it&rsquo;s kind of a dud.</p>
 
 <h2 id="break-up-processing">Break up processing</h2>
 
@@ -165,6 +165,16 @@
 
 <p>GPUs computing is something that I want explore but I just haven&rsquo;t found the time for it yet.</p>
 
+<h3 id="is-brent-s-algorithm-worth-it">Is Brent&rsquo;s Algorithm worth it?</h3>
+
+<p>Remember this thing?  Let&rsquo;s actually measure the impact of using a cycle detection algorithm when finding Buddhabrot points:</p>
+
+<p><img src="/buddhabrot/brents_algorithm_benchmark.png" alt="Brent's Algorithm Benchmark" /></p>
+
+<p>Welp.</p>
+
+<p>To be fair, cycle detection is probably useful for other Mandelbrot scenarios, but in our case it&rsquo;s kind of a dud.</p>
+
 <h2 id="stage-3-plotting-the-points">Stage 3 - Plotting the points</h2>
 
 <p>Once we have a bunch of points, we need to plot their trajectories to generate the density map.</p>
@@ -190,11 +200,7 @@
 
 <h2 id="stage-4-generating-the-image">Stage 4 - Generating the Image</h2>
 
-<p>Generating a single huge image file is only feasible up to a couple of hundred megapixels.  We had already hit some kind of Windows limit with the first 500 megapixel version so a better solution was needed.</p>
-
-<p>After exploring different deep-zoom options, the one that made the most sense to me was to use a web mapping library.  Satellite views on things like Google Maps are the exact same concept as showing a large Buddhabrot rendering - a massive amount of image data that can be displayed at different zoom levels, where only the visible portion is loaded.</p>
-
-<p>Before that, though, we need some way of turning the trajectory map (which is just a bunch of numbers) into colors.</p>
+<p>Before we get into more details about how to display the output, we first need some way of turning the trajectory map (which is just a bunch of numbers) into colors.</p>
 
 <h3 id="fit-the-data">Fit the data!</h3>
 
@@ -232,9 +238,13 @@
 
 <p><img src="/buddhabrot/color_gradients.png" alt="Color gradients" /></p>
 
-<h3 id="generating-the-tiles-zoom-levels">Generating the Tiles / Zoom Levels</h3>
+<h3 id="displaying-the-output">Displaying the Output</h3>
 
-<p>I used a framework called <a href="http://leafletjs.com/">Leaflet</a> to display the final result images.  Each of the 256 x 256 regions from the trajectory map was converted to a tile image.  Those tiles represent the deepest zoom level of the Buddhabrot.  Map frameworks like Leaflet load different sets of images for the different zoom levels - 4 tiles would be represented by 1 when zoomed out a level.</p>
+<p>Generating a single huge image file is only feasible up to a couple of hundred megapixels.  We had already hit some kind of Windows limit with the first 500 megapixel version so a better solution was needed.</p>
+
+<p>After exploring different deep-zoom options, the one that made the most sense to me was to use a web mapping library.  Satellite views on things like Google Maps are the exact same concept as showing a large Buddhabrot rendering - a massive amount of image data that can be displayed at different zoom levels, where only the visible portion is loaded.</p>
+
+<p>I used a framework called <a href="http://leafletjs.com/">Leaflet</a> to display the final result images.  Each of the 256 x 256 regions from the trajectory map was converted to a tile image.  Those tiles represent the deepest zoom level of the Buddhabrot.  Map frameworks like Leaflet load different sets of images for the different zoom levels.  4 tiles would be represented by 1 when zoomed out a level.</p>
 
 <p><img src="/buddhabrot/zoom_levels.png" alt="Zoom levels" /></p>
 
@@ -242,7 +252,7 @@
 
 <p>Originally I used PNG files as the output since it&rsquo;s lossless, but the size was pretty unwieldy - around 45GB for all the tiles.  I found that JPEGs at 80% quality setting looked almost indistinguishable but with a much more palatable final size of under 16GB (and that&rsquo;s without Google&rsquo;s new <a href="https://research.googleblog.com/2017/03/announcing-guetzli-new-open-source-jpeg.html">Guetzli encoder</a>).</p>
 
-<h4 id="image-mechanics-beware-of-system-drawing-bitmap-setpixel">Image Mechanics - Beware of <code>System.Drawing.Bitmap.SetPixel</code></h4>
+<h3 id="image-mechanics-beware-of-system-drawing-bitmap-setpixel">Image Mechanics - Beware of <code>System.Drawing.Bitmap.SetPixel</code></h3>
 
 <p>The standard bitmap class in .NET only has one obvious way of setting colors: <code>SetPixel</code>.  Unfortunately, <code>SetPixel</code> is <em>brutally</em> slow.  The better way to do things is to use <code>LockBits</code>/<code>UnlockBits</code> and to directly manipulate the pixel buffer inside of the image.  I&rsquo;m not sure why they haven&rsquo;t added a nicer convenience method to allow you to set all the colors at once, but it is very much worth your while to do things the hard way:</p>
 

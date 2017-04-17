@@ -63,7 +63,7 @@
     <section class="post-content">
         
 
-<p>At the inaugural <a href="https://indycode.amegala.com/">Indy.Code()</a> conference I presented on how I generated a 68.7 gigapixel rendering of the Buddhabrot fractal.  For now, all you need to know that it&rsquo;s this thing&hellip;</p>
+<p>At the inaugural <a href="https://indycode.amegala.com/">Indy.Code()</a> conference I presented on how I generated a 68.7 gigapixel rendering of the Buddhabrot fractal.  For now, all you need to know is that it&rsquo;s this thing&hellip;</p>
 
 <p><img src="/buddhabrot/normal.jpg" alt="A small Buddhabrot" /></p>
 
@@ -71,17 +71,27 @@
 
 <p>In this series I&rsquo;ll explain what the Buddhabrot is and how I made my version.</p>
 
+<h2 id="series-overview">Series Overview</h2>
+
+<ul>
+<li>Part 1 - What is the Mandelbrot set?</li>
+<li><a href="/post/the-buddhabrot-part-2">Part 2 - What is the Buddhabrot?</a></li>
+<li><a href="/post/the-buddhabrot-part-3">Part 3 - Algorithmic Optimizations</a></li>
+<li><a href="/post/the-buddhabrot-part-4">Part 4 - Code Optimizations</a></li>
+<li><a href="/post/the-buddhabrot-part-5">Part 5 - The Big Reveal</a></li>
+</ul>
+
 <h2 id="introduction">Introduction</h2>
 
-<p>I was introduced to the Buddhabrot in a college class I took about fractals (technically, it was about <em>Chaotic Dynamical Systems</em> but I don&rsquo;t remember too much about that..).  A few years ago at <a href="https://www.sep.com">SEP</a> we introduced <a href="https://www.sep.com/labs/hackathon/">Hackathon Weekends</a>.  The Buddhabrot seemed like the perfect topic for a weekend project so we (I managed to convince two others to help) set out to render a 500 megapixel version.  This was heavily inspired by <a href="http://erleuchtet.org/2010/07/ridiculously-large-buddhabrot.html">Johann Korndoerfer&rsquo;s 500 megapixel version</a> he made in LISP.  I decided to use C#/.NET because that&rsquo;s what I&rsquo;m most comfortable with.</p>
+<p>I was introduced to the Buddhabrot in a college class about fractals (technically, it was about <em>Chaotic Dynamical Systems</em> but I don&rsquo;t remember too much about that).  A few years ago at <a href="https://www.sep.com">SEP</a> we introduced <a href="https://www.sep.com/labs/hackathon/">Hackathon Weekends</a>.  The Buddhabrot seemed like the perfect topic for a weekend project so we (I managed to convince two others to help) set out to render a 500 megapixel version.  This was heavily inspired by <a href="http://erleuchtet.org/2010/07/ridiculously-large-buddhabrot.html">Johann Korndoerfer&rsquo;s 500 megapixel version</a> he made in LISP.  I decided to use C#/.NET because that&rsquo;s what I&rsquo;m most comfortable with.</p>
 
-<p>We succeeded!  Although impressive, I was a bit unsatisfied with all the shortcuts we had to take to accomplish anything in a weekend. I decided to revisit it in a second Hackathon and raised it to 625 megapixels.  That might seem like a modest increase, but the 500 megapixels was a hard limit with the original method.  <em>(As it turns out, the .NET Image class will throw an undocumented Win32 exception if you try to create an image larger than 500MP.  Geez, don&rsquo;t they test anything over there at Microsoft!!!)</em></p>
+<p>We succeeded!  Although impressive, I was a bit unsatisfied with all the shortcuts we had to take to accomplish anything in a weekend. I decided to revisit it in a second Hackathon and raised it to 625 megapixels.  That might seem like a modest increase, but the 500 megapixels was a hard limit with the original method.  <em>(As it turns out, the .NET Image class will throw an undocumented Win32 exception if you try to create an image larger than 500MP.  Geez, don&rsquo;t they test anything over there at Microsoft?!!!)</em></p>
 
 <p><img src="/buddhabrot/history_of_progress.png" alt="History of progress" /></p>
 
 <p>At this point I was hooked so I pushed it up to 10 gigapixels.  I immediately realized my mistake and pushed it to the largest possible version I could create without radically altering my approach - 68.7 gigapixels!</p>
 
-<h4 id="aside-68-7-gigapixels-what-a-weird-number">Aside - 68.7 gigapixels?  What a weird number</h4>
+<h3 id="aside-68-7-gigapixels-what-a-weird-number">Aside - 68.7 gigapixels?  What a weird number</h3>
 
 <p>Now, the number 68.7 might jump out at you because it doesn&rsquo;t sound very computer-sciencey.  How you refer to the size depends on whether you consider a kilopixel to be 1,000 or 1,024 pixels.  If you go by 1,024, the size is actually 64 gigapixels.  Since the only people who actually <em>care</em> about megapixels are camera manufacturers (and they cheat as much as they can get away with) I&rsquo;ll go for the more impressive number.</p>
 
@@ -113,7 +123,7 @@
 
 <h3 id="the-complex-plane">The Complex Plane</h3>
 
-<p>Since complex numbers have two different parts we can draw them in two dimensions.  Mathematicians call this the <strong>complex plane</strong>:</p>
+<p>Since complex numbers have two different parts we can draw one in two dimensions.  Mathematicians display them on something called the <strong>complex plane</strong>:</p>
 
 <p><img src="/buddhabrot/complex_plane.png" alt="Complex Plane" /></p>
 
@@ -125,7 +135,7 @@
 
 <p><img src="/buddhabrot/mandelbrot_set_equation.gif" alt="z = z*z +c" /></p>
 
-<p>where <em>z</em> and <em>c</em> are both complex numbers.  We&rsquo;ll pick any starting point in the gray circle of radius 2 and call it <em>c</em>.  Starting with <em>z</em> = 0, the function says that to calculate the next <em>z</em> value, we take the previous one, square it, and add <em>c</em> to it.  This generates an infinite series of complex numbers.</p>
+<p>where <em>z</em> and <em>c</em> are both complex numbers.  We&rsquo;ll pick any starting point within the gray circle of radius 2 and call it <em>c</em>.  Starting with <em>z</em> = 0, the function says that to calculate the next <em>z</em> value, we take the previous one, square it, and add <em>c</em> to it.  This generates an infinite series of complex numbers.</p>
 
 <p>Something interesting happens with those numbers:</p>
 
@@ -134,7 +144,7 @@
 <li>For other <em>c</em> values, the series of points will <em>never</em> leave the circle of radius 2 <em>even under infinite iteration</em>.</li>
 </ul>
 
-<p>That last part is pretty weird!  What do the the starting points look like that will never escape?</p>
+<p>That last part is pretty weird!  What would it look like if we showed all the starting points that never escape?</p>
 
 <p><img src="/buddhabrot/complex_plane_mandelbrot.png" alt="Mandelbrot Set" /></p>
 
@@ -148,7 +158,7 @@
 
 <p><img src="/buddhabrot/mandelbrot_limits.png" alt="Mandelbrot Set with differing upper limits" /></p>
 
-<p>Here we have three renderings using values of 5, 10, and 15 as the maximum limit.  If the points are still within the circle after that many iterations, we assume they are in the Mandelbrot Set.  As you can see, raising the limit gets us a more defined image.</p>
+<p>Here we have three renderings using values of 5, 10, and 15 as the maximum iteration limit.  If the points are still within the circle after that many iterations, we assume they are in the Mandelbrot Set.  As you can see, raising the limit gets us a more defined image.</p>
 
 <h3 id="for-context">For context&hellip;</h3>
 

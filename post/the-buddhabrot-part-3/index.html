@@ -71,12 +71,22 @@
 <li>Size: 68,719,476,736 pixels (262,144 x 262,144)</li>
 </ul>
 
+<h2 id="series-overview">Series Overview</h2>
+
+<ul>
+<li><a href="/post/the-buddhabrot-part-1">Part 1 - What is the Mandelbrot set?</a></li>
+<li><a href="/post/the-buddhabrot-part-2">Part 2 - What is the Buddhabrot?</a></li>
+<li>Part 3 - Algorithmic Optimizations</li>
+<li><a href="/post/the-buddhabrot-part-4">Part 4 - Code Optimizations</a></li>
+<li><a href="/post/the-buddhabrot-part-5">Part 5 - The Big Reveal</a></li>
+</ul>
+
 <h2 id="algorithmic-optimizations">Algorithmic Optimizations</h2>
 
 <blockquote>
 <p>The real problem is that programmers have spent far too much time worrying about efficiency in the wrong places and at the wrong times; <strong>premature optimization is the root of all evil</strong> (or at least most of it) in programming.</p>
 
-<p>Donald Knuth</p>
+<p><a href="https://en.wikipedia.org/wiki/Donald_Knuth">Donald Knuth</a></p>
 </blockquote>
 
 <p>Before we start throwing code at the problem we&rsquo;re going to have to put on our thinking caps and try to figure out some ways to reduce the amount of work we&rsquo;re doing.</p>
@@ -85,7 +95,7 @@
 
 <p><img src="/buddhabrot/complex_plane_mandelbrot.png" alt="Mandelbrot Set" /></p>
 
-<p>Since we only care about points that <em>aren&rsquo;t</em> in the set and our maximum iteration count is pretty high (5 million), picking a point that&rsquo;s inside the set is obviously very expensive.  Remember, those points will never leave the circle even under infinite iteration, so we will always loop for our maximum number before we have to throw away all that work.</p>
+<p>We&rsquo;re starting by picking random points inside the circle.  Since we only care about points that <em>aren&rsquo;t</em> in the set and our maximum iteration count is pretty high (5 million), picking a point that&rsquo;s inside the set is obviously very expensive.  Remember, those points will never leave the circle even under infinite iteration, so we will always loop for our maximum number before we have to throw away all that work.</p>
 
 <p>Is there some faster way to tell whether a point is in the set?</p>
 
@@ -137,7 +147,7 @@
 
 <p>Perhaps unsurprisingly, they will eventually get caught in an infinite loop, generating the same points over and over again.</p>
 
-<h4 id="cycle-detection">Cycle Detection</h4>
+<h3 id="cycle-detection">Cycle Detection</h3>
 
 <p>To catch points like that we can use a cycle detection algorithm like <a href="https://en.wikipedia.org/wiki/Cycle_detection#Brent.27s_algorithm">Brent&rsquo;s algorithm</a>.  Essentially, it periodically checks the current <em>z</em> value against an older version to see if we&rsquo;re revisiting older points.</p>
 
@@ -153,7 +163,7 @@
 
 <p>Can you think of an optimization we haven&rsquo;t talked about?  Hint: it would make things twice as fast&hellip;</p>
 
-<p>If you guessed something involving <em>symmetry</em> you are correct.  The Mandelbrot set is perfectly symmetrical across the real axis.  For the purpose of the Buddhabrot, we <em>could</em> mirror everything we did and thereby find points twice as fast, at the cost of making it mirrored.  We&rsquo;ll revisit this when I talk about the final rendering, but this is one optimization I intentionally skipped.</p>
+<p>If you guessed something involving <em>symmetry</em> you are correct.  The Mandelbrot set is perfectly symmetrical across the real axis.  For the purpose of the Buddhabrot, we <em>could</em> mirror the trajectories we plot and thereby make everything twice as fast.  However, since we&rsquo;re picking random starting points, you lose a bit of visual interest by making the Buddhabrot symmetrical.  We&rsquo;ll revisit this when I talk about the final rendering, but this is one optimization I intentionally skipped.</p>
 
 <h2 id="summary">Summary</h2>
 

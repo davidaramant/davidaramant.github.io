@@ -63,7 +63,17 @@
     <section class="post-content">
         
 
-<p>In the <a href="/post/the-buddhabrot-part-2">last part</a> we learned what the Mandelbrot set is.</p>
+<p>In the <a href="/post/the-buddhabrot-part-1">last part</a> we learned what the Mandelbrot set is.</p>
+
+<h2 id="series-overview">Series Overview</h2>
+
+<ul>
+<li><a href="/post/the-buddhabrot-part-1">Part 1 - What is the Mandelbrot set?</a></li>
+<li>Part 2 - What is the Buddhabrot?</li>
+<li><a href="/post/the-buddhabrot-part-3">Part 3 - Algorithmic Optimizations</a></li>
+<li><a href="/post/the-buddhabrot-part-4">Part 4 - Code Optimizations</a></li>
+<li><a href="/post/the-buddhabrot-part-5">Part 5 - The Big Reveal</a></li>
+</ul>
 
 <h2 id="visualizing-the-mandelbrot-set">Visualizing the Mandelbrot Set</h2>
 
@@ -132,6 +142,8 @@
 <li>The final image is a visualization of how often each pixel location was visited by a trajectory.  In the above image, brighter pixels were visited more often, while the black areas were totally skipped.</li>
 </ul>
 
+<p>I cheated in the above definition - the first step talks about &ldquo;the points not in the Mandelbrot set&rdquo; like that&rsquo;s something that&rsquo;s trivial to express.  What that actually means in practice is that we&rsquo;ll pick some random points inside of the circle, make sure that they&rsquo;re not in the set, and plot their trajectories.</p>
+
 <h3 id="why-do-we-only-plot-the-numbers-that-are-not-in-the-mandelbrot-set">Why do we only plot the numbers that are <em>not</em> in the Mandelbrot set?</h3>
 
 <p>If you reverse it and only plot points <em>in</em> the set, you&rsquo;ll wind up with the <strong>Anti-Buddhabrot</strong>:</p>
@@ -190,7 +202,7 @@
 
 <p><img src="/buddhabrot/noisy_buddhabrot.png" alt="Noisy Buddhabrot" /></p>
 
-<p>Remember that we&rsquo;re visualizing a density map of how many times each pixel location has been visited.  If we don&rsquo;t plot enough points, our map will be extremely noisy like the above image.</p>
+<p>Remember that we&rsquo;re visualizing a density map of how many times each pixel location has been visited.  If we don&rsquo;t plot enough points, our map will be extremely noisy like the above image.  The above image might also be what happens if you try to simply iterate over every pixel location and plot the trajectory of the corresponding point.  We need <em>lots</em> more points than that, which is why we have pick random starting points (and lots of them!).</p>
 
 <h2 id="summary-the-buddhabrot-is-slow">Summary - The Buddhabrot is Slow!</h2>
 
@@ -202,9 +214,9 @@
 <li>Unlike the normal Mandelbrot visualization, there is not a 1:1 mapping between points and pixels</li>
 </ul>
 
-<p>A normal Mandelbrot visualization can be done in real-time (or close to it).  There are lots of fractal viewer programs you can download to play around with it.  One popular thing to do is to zoom in at incredible magnifications.  This is feasible because every pixel in the output corresponds to one complex number.  Making a rendering at 1x or 100,000,000x magnification is the same effort (minus any overhead from using an arbitrary-precision data type) - it&rsquo;s the same number of pixels, so it&rsquo;s the same number of complex numbers to iterate.</p>
+<p>A normal Mandelbrot visualization can be done in real-time (or close to it).  There are lots of fractal viewer programs you can download to play around with it.  One popular thing to do is to zoom in at incredible magnifications, which is feasible because every pixel in the output corresponds to one complex number.  Making a rendering at 1x or 100,000,000x magnification is the same effort (minus any overhead from using an arbitrary-precision data type) - it&rsquo;s the same number of pixels, so it&rsquo;s the same number of complex numbers to iterate.</p>
 
-<p>Not so for the Buddhabrot.  Because we don&rsquo;t know which starting points will contribute to a particular pixel location, zooming in real-time is not feasible.  You <em>can</em> estimate which points you should iterate to get an image using technique like the Metropolis-Hastings algorithm, but that&rsquo;s pretty advanced.  It&rsquo;s actually much conceptually simpler to pre-render a gigantic version of it and zoom in after-the-fact.</p>
+<p>Not so for the Buddhabrot.  Because we don&rsquo;t know which starting points will contribute to a particular pixel location, zooming in real-time is not feasible.  You <em>can</em> estimate which points you should iterate to get an image using technique like the Metropolis-Hastings algorithm, but that&rsquo;s a pretty advanced topic that I haven&rsquo;t delved into much.  It&rsquo;s actually much conceptually simpler to pre-render a gigantic version of it and zoom in after-the-fact.  Since we don&rsquo;t know (yet!) where the points are that contribute to a particular pixel, we pick the starting points at random from inside the circle.</p>
 
 <p>My particular version has the following stats:</p>
 
