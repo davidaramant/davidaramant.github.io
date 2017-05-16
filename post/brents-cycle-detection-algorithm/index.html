@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>In Defense of Brent&#39;s Cycle Detection Algorithm &middot; David Aramant</title>
+    <meta name="author" content="David Aramant">
+    
+    <meta name="generator" content="Hugo 0.20.5" />
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <!-- RSS autodiscovery -->
+    
+
+    <link rel="shortcut icon" href="https://davidaramant.github.io/img/favicon.ico">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://davidaramant.github.io/css/screen.css">
+    <link rel="stylesheet" href="https://davidaramant.github.io/css/github.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/styles/default.min.css">
+    
+
+    
+
+    <!-- Stylesheet for theme color -->
+    <style type="text/css">
+    a, a:visited {color: #f05948;}
+    .pagination a {color: #f05948;}
+    .gist .gist-file .gist-meta a:visited {color: #f05948 !important;}
+    a:focus, a:hover {color: #c62310;}
+    h1.post-title a:focus, h1.post-title a:hover, h1.blog-title a:focus, h1.blog-title a:hover {color: #c62310;}
+    .older-posts:hover, .newer-posts:hover {color: #c62310;}
+</style>
+</head>
+
+<body class="home-template">
+    <header id="site-head">
+	
+	<h1 class="blog-title"><a href="https://davidaramant.github.io/">David Aramant</a></h1>
+	
+	
+	<h1 class="blog-subtitle">Hi! You&rsquo;ve somehow found my blog!</h1>
+	
+</header>
+    
+    
+    <main class="content" role="main">
+    
+<article class="post">
+    <header>
+        <h1 class="post-title">In Defense of Brent&#39;s Cycle Detection Algorithm</h1>
+        <div class="post-meta">
+            <time datetime="16 May 2017">
+                16 May 2017
+            </time>
+        </div>
+    </header>
+
+    <section class="post-content">
+        
+
+<p>In my earlier series about the Buddhabrot I vilely slandered Brent&rsquo;s Cycle Detection Algorithm as <a href="/post/the-buddhabrot-part-4#is-brent-s-algorithm-worth-it">&ldquo;kind of a dud.&rdquo;</a>  Well, I&rsquo;m 99% sure I implemented it wrong the first time I tried it out (oops) so I think it&rsquo;s time to give it a fairer shot.</p>
+
+<p>I came across the concept of an <em>automatic iteration limit</em> algorithm for finding out whether a point is inside the <a href="/post/the-buddhabrot-part-1">Mandelbrot set</a>.  In this method, there isn&rsquo;t an explicit maximum iteration count passed in - it will only stop iterating if the point escapes or it detects a cycle.  The cycle detection algorithm better work in this case!</p>
+
+<h2 id="finite-iteration-limit">Finite Iteration Limit</h2>
+
+<p>Here&rsquo;s a simplfied traditional version of the finding out whether a point is inside the Mandelbrot set:</p>
+
+<pre><code class="language-cs">public bool IsPointInMandelbrotSet(Complex c, int maxLimit)
+{
+    var z = Complex.Zero;
+
+    for (int i = 0; i &lt; maxLimit; i++)
+    {
+        z = z * z + c;
+
+        // check if the point has escaped the circle of radius 2
+        if (z.Magnitude &gt; 2)
+        {
+            return false;
+        }
+    }
+
+    // Point never escaped, so we think it's in the Mandelbrot set
+    return true;
+}
+</code></pre>
+
+<p>If we feed this method a complex number inside the set, it will take exactly <code>maxLimit</code> iterations to return.</p>
+
+<h2 id="automatic-iteration-limit">Automatic Iteration Limit</h2>
+
+<p>Let&rsquo;s see it <em>without</em> the max limit parameter:</p>
+
+<pre><code class="language-cs">public bool IsPointInMandelbrotSet(Complex c)
+{
+    var z = Complex.Zero;
+    var oldZ = Complex.Zero;
+
+    int stepsTaken = 0;
+    int stepLimit = 2;
+
+    int iterations = 0;
+
+    while (z.Magnitude &lt;= 2)
+    {
+        z = z * z + c;
+
+        // z matches an old value, so we found a cycle
+        if (z == oldZ)
+            return true;
+
+        // Time to update the old value
+        if (stepsTaken == stepLimit)
+        {
+            oldZ = z;
+            stepsTaken = 0;
+            stepLimit *= 2;
+        }
+
+        stepsTaken++;
+        iterations++;
+    }
+
+    // Point escaped, so it's not in the Mandelbrot set
+    return false;
+}
+</code></pre>
+
+<p>For points inside of the set, it relies entirely on the cycle detection algorithm for knowing when to stop.</p>
+
+<p>When I implemented it the first time, I screwed up when the values were compared (basically, the <code>z == oldZ</code> part was <em>inside</em> the next <code>if</code> statement).  I also didn&rsquo;t use a separate counter for <code>stepsTaken</code> either, which I&rsquo;m sure screws up the math.  In my defense, the pseudo code on <a href="https://en.wikipedia.org/wiki/Cycle_detection#Brent.27s_algorithm">Wikipedia</a> is a bit unclear and isn&rsquo;t exactly the same usecase as this.</p>
+
+<h2 id="is-it-fast">Is it fast?</h2>
+
+<p>Well, it depends on your max iteration limit and the points you&rsquo;re feeding it&hellip;  If you have a really low iteration limit, it might take substantially more iterations to find a cycle than just iterating for a set amount.</p>
+
+<p>Let&rsquo;s benchmark this.  We&rsquo;ll compute a 25x25 grid of points in a complex area with real bounds of (-1.45, 0.75) and imaginary bounds of (-1.1, 1.1).  This will give us a good mix of points outside and inside the set.  We&rsquo;ll leave out threading and geometric checks that can short-circuit the algorithm and plot the relative speed of each method (using the finite limit approach as the baseline; I.E. 1).</p>
+
+<p><img src="/brents-algo/Finite_vs_Cycle_1K.png" alt="Finite Limit vs Cycle Detection 1K" /></p>
+
+<p>Yowza.  The cycle detection method is nearly 200x slower!</p>
+
+<p>Let&rsquo;s see what happens when we bump up the iteration limit to 1 million:</p>
+
+<p><img src="/brents-algo/Finite_vs_Cycle_1M.png" alt="Finite Limit vs Cycle Detection 1M" /></p>
+
+<p>That&rsquo;s better - the cycle detection is able to bail out of the loop far earlier than 1 million iterations.</p>
+
+<h2 id="best-of-both-worlds">Best of Both Worlds?</h2>
+
+<p><img src="/brents-algo/Why_not_both.jpg" alt="Why not both?" /></p>
+
+<p>Of course, there&rsquo;s nothing preventing us from combining both approaches:</p>
+
+<pre><code class="language-cs">public bool IsPointInMandelbrotSet(Complex c, int maxLimit)
+{
+    var z = Complex.Zero;
+    var oldZ = Complex.Zero;
+
+    int stepsTaken = 0;
+    int stepLimit = 2;
+
+    for (int i = 0; i &lt; maxLimit; i++)
+    {
+        z = z * z + c;
+
+        if (z.Magnitude &gt; 2)
+        {
+            return false;
+        }
+
+        if (z == oldZ)
+            return true;
+
+        if (stepsTaken == stepLimit)
+        {
+            oldZ = z;
+            stepsTaken = 0;
+            stepLimit *= 2;
+        }
+
+        stepsTaken++;
+    }
+
+    return true;
+}
+</code></pre>
+
+<p>The results are better in both cases:</p>
+
+<p><img src="/brents-algo/Both_1K.png" alt="Benchmark of using both methods 1K" />
+(I left out the cycle-detection only method because it was so amazingly bad in this benchmark)</p>
+
+<p><img src="/brents-algo/Both_1M.png" alt="Benchmark of using both methods 1M" /></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Well, I think the results speak for themselves.  Brent&rsquo;s Cycle Detection Algorithm is a great thing to use when doing Mandlebrot set calculations, especially once you start getting into massive iteration limits.  Its honor has been restored.</p>
+
+    </section>
+
+    
+    <section class="post-tags" style="padding-bottom:60px;">
+        <div class="post-meta tags">
+            <i class="fa fa-fw fa-tag"></i>
+            
+                
+                <a href="https://davidaramant.github.io/tags/buddhabrot">Buddhabrot </a>
+            
+        </div>
+    </section>
+    
+    
+    <section class="share">
+    <p class="backtotop"><a data-scroll href="#site-head"><i class="fa fa-lg fa-fw fa-angle-double-up"></i></a><a data-scroll class="backtotoptext" href="#site-head"> Back to top</a></p>
+    <p class="info prompt">Share</p>
+    <a href="http://twitter.com/share?text=In%20Defense%20of%20Brent%27s%20Cycle%20Detection%20Algorithm&url=https%3a%2f%2fdavidaramant.github.io%2fpost%2fbrents-cycle-detection-algorithm%2f" title="Share on Twitter"
+        onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+        <i class="fa fa-2x fa-fw fa-twitter-square"></i> <span class="hidden">Twitter</span>
+    </a>
+    <a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fdavidaramant.github.io%2fpost%2fbrents-cycle-detection-algorithm%2f" title="Share on Facebook"
+        onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+        <i class="fa fa-2x fa-fw fa-facebook-square" style="margin-left: -8px"></i> <span class="hidden">Facebook</span>
+    </a>
+    <a href="https://plus.google.com/share?url=https%3a%2f%2fdavidaramant.github.io%2fpost%2fbrents-cycle-detection-algorithm%2f" title="Share on Google+"
+       onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+        <i class="fa fa-2x fa-fw fa-google-plus-square" style="margin-left: -8px"></i> <span class="hidden">Google+</span>
+    </a>
+</section>
+
+    <footer class="post-footer">
+        <section class="author">
+    <div class="authorimage" style="background: url(https://davidaramant.github.io/img/avatar.jpg)"></div>
+    <h4>David Aramant</h4>
+    <p class="bio">I work at <a href="https://www.sep.com">SEP</a>.</p>
+    <p class="meta">
+      
+    </p>
+</section>
+    </footer>
+    
+</article>
+
+    </main>
+
+    <footer class="site-footer">
+	<div class="inner">
+		<section class="footer-social">
+      
+      <a href="//twitter.com/davidaramant" target="_blank" title="Twitter"><i class="fa fa-2x fa-fw fa-twitter"></i> <span class="hidden">Twitter</span></a>&nbsp;
+      
+      
+      
+      
+      
+      
+      <a href="//github.com/davidaramant" target="_blank" title="GitHub"><i class="fa fa-2x fa-fw fa-github"></i> <span class="hidden">GitHub</span></a>&nbsp;
+      
+      
+      
+      
+  </section>
+
+		<section class="copyright">&copy; 2017 <a href="https://davidaramant.github.io/">David Aramant</a>. </section>
+	</div>
+</footer>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://davidaramant.github.io/js/index.js"></script>
+<script src="https://davidaramant.github.io/js/smooth-scroll.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+
+
+<script>
+    smoothScroll.init({
+        speed: 800,
+        easing: 'easeInOutCubic',
+        updateURL: false,
+        offset: 125,
+    });
+</script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+
+</body>
+</html>

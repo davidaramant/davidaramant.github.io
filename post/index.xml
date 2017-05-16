@@ -6,10 +6,20 @@
     <description>Recent content in Posts on David Aramant</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 12 Apr 2017 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 16 May 2017 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="https://davidaramant.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>In Defense of Brent&#39;s Cycle Detection Algorithm</title>
+      <link>https://davidaramant.github.io/post/brents-cycle-detection-algorithm/</link>
+      <pubDate>Tue, 16 May 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://davidaramant.github.io/post/brents-cycle-detection-algorithm/</guid>
+      <description>In my earlier series about the Buddhabrot I vilely slandered Brent&amp;rsquo;s Cycle Detection Algorithm as &amp;ldquo;kind of a dud.&amp;rdquo; Well, I&amp;rsquo;m 99% sure I implemented it wrong the first time I tried it out (oops) so I think it&amp;rsquo;s time to give it a fairer shot.
+I came across the concept of an automatic iteration limit algorithm for finding out whether a point is inside the Mandelbrot set. In this method, there isn&amp;rsquo;t an explicit maximum iteration count passed in - it will only stop iterating if the point escapes or it detects a cycle.</description>
+    </item>
     
     <item>
       <title>The Buddhabrot Part 5: The Big Reveal</title>

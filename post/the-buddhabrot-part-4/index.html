@@ -7,7 +7,7 @@
     <title>The Buddhabrot Part 4: Code Optimizations &middot; David Aramant</title>
     <meta name="author" content="David Aramant">
     
-    <meta name="generator" content="Hugo 0.20" />
+    <meta name="generator" content="Hugo 0.20.5" />
     <meta name="HandheldFriendly" content="True">
     <meta name="MobileOptimized" content="320">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -175,6 +175,8 @@
 
 <p>To be fair, cycle detection is probably useful for other Mandelbrot scenarios, but in our case it&rsquo;s kind of a dud.</p>
 
+<p><strong>Addendum 2017-05-16:</strong>  I&rsquo;m pretty sure I didn&rsquo;t implement Brent&rsquo;s Algorithm correctly.  See my <a href="/post/brents-cycle-detection-algorithm">follow-up post</a> for details.</p>
+
 <h2 id="stage-3-plotting-the-points">Stage 3 - Plotting the points</h2>
 
 <p>Once we have a bunch of points, we need to plot their trajectories to generate the density map.</p>
@@ -279,9 +281,6 @@
     <section class="post-tags" style="padding-bottom:60px;">
         <div class="post-meta tags">
             <i class="fa fa-fw fa-tag"></i>
-            
-                
-                <a href="https://davidaramant.github.io/tags/work-related">Work related </a>
             
                 
                 <a href="https://davidaramant.github.io/tags/buddhabrot">Buddhabrot </a>
