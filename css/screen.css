@@ -251,7 +251,7 @@ blockquote {
 div.authorimage {
   width: 80px;
   height: 80px;
-/* border-radius: 50%; */
+  border-radius: 50%;
   -webkit-background-size: cover !important;
   background-size: cover !important;
   background-position: center center !important;
